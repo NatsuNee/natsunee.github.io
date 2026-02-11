@@ -19,30 +19,36 @@
         </style>
     </head>
 
-    <div class="masthead" style="background-image: url('./assets/background.jpg');"> <div class=" color-overlay d-flexjustify-content-center align-items-center"></div>
+    
+    <!-- <div class="masthead" style="background-image: url('./assets/background.jpg');"> <div class=" color-overlay d-flexjustify-content-center align-items-center"></div> -->
 
     <body scroll="no" style="overflow: hidden">
-        <main>
-            <tr>
-                <td>
-                    <img class="nav-link" src="/assets/Bin.png" alt="">
-                </td>
-                <td>
-                    <a href=https://www.youtube.com/channel/UCnPl4svW3A1-UA8Cg6bdrlw> <img src="assets/Youtube.png" class="nav-link"> </a>
-                </td>
-                <td>
-                    <a href=https://www.twitch.tv/obu_twitch> <img src="assets/Twitch.png" class="nav-link"> </a>
-                </td>
-                <td>
-                    <a href=https://github.com/NatsuNee> <img src="assets/Github.png" class="nav-link"> </a>
-                </td>
-                <td>
-                    <a href=https://www.linkedin.com/in/StephenThach> <img src="assets/Linkedin.png" class="nav-link"> </a>
-                </td>
-                <td>
-                    <a href="assets/Thach_Master_Resume.docx?v=1"> <img src="assets/Resume.png" class="nav-link"> </a>
-                </td>
-        </main>
+
+    <div id="viewer" style="width: 100%; height: 500px;"></div>
+
+
+    <main>
+        <div class="icon-vertical">
+            <img src="/assets/Bin.png" class="icon">
+            <a href="https://www.youtube.com/channel/UCnPl4svW3A1-UA8Cg6bdrlw">
+                <img src="assets/Youtube.png" class="icon">
+            </a>
+            <a href="https://www.twitch.tv/obu_twitch">
+                <img src="assets/Twitch.png" class="icon">
+            </a>
+            <a href="https://github.com/NatsuNee">
+                <img src="assets/Github.png" class="icon">
+            </a>
+            <a href="https://www.linkedin.com/in/StephenThach">
+                <img src="assets/Linkedin.png" class="icon">
+            </a>
+            <a href="assets/Thach_Master_Resume.docx?v=1">
+                <img src="assets/Resume.png" class="icon">
+            </a>
+        </div>
+    </main>
+
+
         <nav class="navbar navbar-expand fixed-bottom bg-dark">
             <div class="container-xxl">
                 <a href=#> <img src="assets/Start.png" class="nav-link"> </a>
@@ -123,7 +129,24 @@
             </div>
         </div>
 
-        <script src="js/bootstrap.bundle.min.js"></script>
-        <script src="main.js" type="module"></script>
+<script type="importmap">
+{
+    "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.152.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.152.0/examples/jsm/"
+    }
+}
+</script>
+
+<!-- viewer.js MUST be loaded as a module -->
+<script type="module" src="assets/viewer.js"></script>
+
+<!-- Your other scripts -->
+<script src="js/bootstrap.bundle.min.js"></script>
+<script src="main.js"></script>
+
+
+       <script type="module" src="assets/viewer.js"></script>
+
     </body>
 </html>
