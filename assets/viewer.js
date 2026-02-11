@@ -2,17 +2,24 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-
-
-
-// Grab the container
 const container = document.getElementById('viewer');
 
-// Create scene
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x111111);
 
-// Camera
+const cubeLoader = new THREE.CubeTextureLoader();
+cubeLoader.setPath('assets/skybox/');
+
+const skyboxTexture = cubeLoader.load([
+    'px.png',
+    'nx.png',
+    'py.png',
+    'ny.png',
+    'pz.png',
+    'nz.png',
+]);
+
+scene.background = skyboxTexture;
+
 const camera = new THREE.PerspectiveCamera(
     45,
     window.innerWidth / window.innerHeight,
@@ -21,21 +28,18 @@ const camera = new THREE.PerspectiveCamera(
 );
 camera.position.set(2, 2, 3);
 
-// Renderer
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
 container.appendChild(renderer.domElement);
 
-// Controls
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
-controls.enablePan = false; // cleaner interaction
-controls.minDistance = 1;
-controls.maxDistance = 10;
+controls.enablePan = false; 
+controls.minDistance = 10;
+controls.maxDistance = 20;
 
-// Studio Lighting
 const keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
 keyLight.position.set(5, 5, 5);
 keyLight.castShadow = true;
@@ -52,12 +56,11 @@ scene.add(rimLight);
 const ambient = new THREE.AmbientLight(0xffffff, 0.3);
 scene.add(ambient);
 
-// Load Model
+
 const loader = new GLTFLoader();
-loader.load('assets/Grandpa.glb', (gltf) => {
+loader.load('assets/Chill Guy.glb', (gltf) => {
     const model = gltf.scene;
 
-    // Enable shadows
     model.traverse((node) => {
         if (node.isMesh) {
             node.castShadow = true;
@@ -65,13 +68,23 @@ loader.load('assets/Grandpa.glb', (gltf) => {
         }
     });
 
-    // Optional: center model
     const box = new THREE.Box3().setFromObject(model);
     const center = box.getCenter(new THREE.Vector3());
     model.position.sub(center);
 
+    model.traverse((child) => {
+    if (child.isMesh) {
+        child.material.envMap = skyboxTexture;
+        child.material.envMapIntensity = 1.0; // adjust for brightness
+        child.material.needsUpdate = true;
+    }
+});
+
+
     scene.add(model);
 });
+
+
 
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -79,9 +92,6 @@ window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-
-
-// Animation loop
 function animate() {
     requestAnimationFrame(animate);
     controls.update();
