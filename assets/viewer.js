@@ -39,6 +39,8 @@ controls.dampingFactor = 0.05;
 controls.enablePan = false; 
 controls.minDistance = 10;
 controls.maxDistance = 20;
+controls.autoRotate = true;        // enable rotation
+controls.autoRotateSpeed = .5;
 
 const keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
 keyLight.position.set(5, 5, 5);
