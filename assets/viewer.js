@@ -71,7 +71,7 @@ const playerCollider = new THREE.Mesh(
   new THREE.CapsuleGeometry(0.3, 1.0, 4, 8),
   new THREE.MeshBasicMaterial({ visible: false })
 );
-playerCollider.position.set(100, 110, 100);  //SPAWN
+playerCollider.position.set(100, 79, 100);  //SPAWN
 scene.add(playerCollider);
 
 function checkCollision() {
@@ -94,7 +94,7 @@ const velocity = new THREE.Vector3();
 const direction = new THREE.Vector3();
 const clock = new THREE.Clock();
 
-const gravity = 30;
+const gravity = 0;
 const playerHeight = 2.8;
 let canJump = false;
 
