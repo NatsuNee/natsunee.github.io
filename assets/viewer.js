@@ -53,7 +53,7 @@ document.body.addEventListener('click', () => controls.lock());
 // -----------------------------------------------------
 scene.add(new THREE.AmbientLight(0xffffff, 0.3));
 
-const keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
+const keyLight = new THREE.DirectionalLight(0xffffff, 0.6);
 keyLight.position.set(5, 5, 5);
 keyLight.castShadow = true;
 scene.add(keyLight);
@@ -62,13 +62,29 @@ scene.add(keyLight);
 // -----------------------------------------------------
 // PLAYER COLLIDER (Capsule)
 // -----------------------------------------------------
+const colliders = [];
+const platforms = [];
+const floors = [];
+
+
 const playerCollider = new THREE.Mesh(
   new THREE.CapsuleGeometry(0.3, 1.0, 4, 8),
   new THREE.MeshBasicMaterial({ visible: false })
 );
-playerCollider.position.set(0, 1.7, 5);
+playerCollider.position.set(100, 110, 100);  //SPAWN
 scene.add(playerCollider);
 
+function checkCollision() {
+    const playerBox = new THREE.Box3().setFromObject(playerCollider);
+
+    for (const c of colliders) {
+        const box = new THREE.Box3().setFromObject(c);
+        if (playerBox.intersectsBox(box)) {
+            return true;
+        }
+    }
+    return false;
+}
 
 // -----------------------------------------------------
 // MOVEMENT STATE + PHYSICS
@@ -79,9 +95,8 @@ const direction = new THREE.Vector3();
 const clock = new THREE.Clock();
 
 const gravity = 30;
-const playerHeight = 1.7;
+const playerHeight = 2.8;
 let canJump = false;
-
 
 // -----------------------------------------------------
 // INPUT HANDLING (Keyboard)
@@ -172,14 +187,204 @@ function loadModel(path, envMap, onLoad) {
 
 loadModel('/assets/Chill Guy.glb', skyboxTexture, (model) => {
     model.position.sub(new THREE.Vector3(0, 1, 0));
-
     scene.add(model);
 });
 
-loadModel('/assets/Test.glb', skyboxTexture, (model) => {
+loadModel('/assets/Ground.glb', skyboxTexture, (model) => {
     model.position.sub(new THREE.Vector3(0, 2, 0));
+    
+    model.traverse((child) => {
+        if (child.isMesh) {
+            floors.push(child); 
+        }
+    });
+
     scene.add(model);
 });
+
+loadModel('/assets/HotelFloor.glb', skyboxTexture, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+
+    model.traverse((child) => {
+    if (child.isMesh) {
+        floors.push(child);
+        child.visible = false;
+    }
+    });
+    
+    scene.add(model);
+});
+
+loadModel('/assets/HotelWalls.glb', skyboxTexture, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+loadModel('/assets/HotelWalls2.glb', skyboxTexture, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+loadModel('/assets/HotelWalls3.glb', skyboxTexture, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+loadModel('/assets/HotelWalls4.glb', skyboxTexture, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+loadModel('/assets/HotelWalls5.glb', skyboxTexture, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+loadModel('/assets/HotelWalls6.glb', skyboxTexture, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+loadModel('/assets/HotelWalls7.glb', skyboxTexture, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+loadModel('/assets/HotelWalls8.glb', skyboxTexture, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+loadModel('/assets/HotelWalls9.glb', skyboxTexture, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+loadModel('/assets/HotelWalls10.glb', skyboxTexture, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+loadModel('/assets/HotelWalls11.glb', skyboxTexture, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+loadModel('/assets/HotelWalls12.glb', skyboxTexture, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+loadModel('/assets/HotelWalls13.glb', skyboxTexture, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+loadModel('/assets/HotelWalls14.glb', skyboxTexture, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+loadModel('/assets/HotelWalls15.glb', skyboxTexture, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+loadModel('/assets/HotelWalls16.glb', skyboxTexture, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+loadModel('/assets/HotelWalls17.glb', skyboxTexture, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
 
 // -----------------------------------------------------
 // MAIN GAME LOOP
@@ -189,6 +394,9 @@ function animate() {
 
   const delta = clock.getDelta();
   const speed = 10;
+
+  // Save old position BEFORE movement
+  const oldPos = playerCollider.position.clone();
 
   // Apply friction
   velocity.x -= velocity.x * 10 * delta;
@@ -217,19 +425,35 @@ function animate() {
   // Apply vertical velocity
   playerCollider.position.y += velocity.y * delta;
 
-  // Ground collision
-  if (playerCollider.position.y < playerHeight) {
-    playerCollider.position.y = playerHeight;
-    velocity.y = 0;
-    canJump = true;
+  // COLLISION CHECK
+  if (checkCollision()) {
+      playerCollider.position.copy(oldPos); // revert movement
+      velocity.y = 0; // stop falling into walls
   }
+
+  const ray = new THREE.Raycaster(
+    playerCollider.position,
+    new THREE.Vector3(0, -1, 0)
+);
+
+const hits = ray.intersectObjects(floors, true);
+
+if (hits.length > 0) {
+    const y = hits[0].point.y + playerHeight;
+
+    // If player is at or below the floor height
+    if (playerCollider.position.y <= y + 0.05) {
+        playerCollider.position.y = y;
+        velocity.y = 0;      // <— THIS stops infinite gravity
+        canJump = true;      // <— allows jumping again
+    }
+}
 
   // Sync camera to collider
   controls.getObject().position.copy(playerCollider.position);
 
   renderer.render(scene, camera);
 }
-
 
 // -----------------------------------------------------
 // RESIZE HANDLING
