@@ -107,12 +107,6 @@ document.addEventListener('keydown', (e) => {
     case 'KeyS': move.backward = true; break;
     case 'KeyA': move.left = true; break;
     case 'KeyD': move.right = true; break;
-    case 'Space':
-      if (canJump) {
-        velocity.y = 10;
-        canJump = false;
-      }
-      break;
   }
 });
 
@@ -421,9 +415,6 @@ function animate() {
   // Move player collider
   playerCollider.position.addScaledVector(forward, direction.z * speed * delta);
   playerCollider.position.addScaledVector(right, direction.x * speed * delta);
-
-  // Apply vertical velocity
-  playerCollider.position.y += velocity.y * delta;
 
   // COLLISION CHECK
   if (checkCollision()) {
