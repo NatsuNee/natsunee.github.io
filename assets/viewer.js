@@ -22,6 +22,18 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 
+const cinematicCamera = new THREE.PerspectiveCamera(
+  60,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  1000
+);
+cinematicCamera.position.set(120, 120, 120);
+cinematicCamera.lookAt(93, 79, 110); // your spawn area
+
+let gameState = "cinematic"; 
+// other state: "firstPerson"
+
 // Renderer
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -47,8 +59,176 @@ const controls = new PointerLockControls(camera, document.body);
 scene.add(controls.getObject());
 
 // Lock pointer on click
-document.body.addEventListener('click', () => controls.lock());
+// document.body.addEventListener('click', () => controls.lock());
 
+const playButton = document.getElementById("playButton");
+let hasStarted = false;
+
+playButton.addEventListener("click", () => {
+    const fade = document.getElementById("fade");
+
+    if (!hasStarted) {
+        hasStarted = true;
+
+        fade.style.opacity = 1;
+
+        setTimeout(() => {
+            gameState = "firstPerson";
+
+            camera.position.copy(playerCollider.position);
+            controls.lock();
+
+            fade.style.opacity = 0;
+        }, 1500);
+
+        return;
+    }
+
+    // After first time: no fade, just lock instantly
+    gameState = "firstPerson";
+    camera.position.copy(playerCollider.position);
+    controls.lock();
+});
+
+
+// -----------------------------------------------------
+// CINEMATIC SHOTS (Predefined Camera Paths)
+// -----------------------------------------------------
+const cinematicShots = [
+  {
+    pos: new THREE.Vector3(-5, 0, -50),
+    rot: new THREE.Euler(0, 3.4, 0),
+    duration: 100,
+    transition: 2000,
+    fade: false,
+    fadeStart: 0 // no fade
+  },
+  {
+    pos: new THREE.Vector3(-10, 60, 200),
+    rot: new THREE.Euler(0, 5, 0),
+    duration: 1000,
+    transition: 40000,
+    fade: true,
+    fadeStart: 1500 // start fading 1.5s BEFORE the shot ends
+  },
+  {
+    pos: new THREE.Vector3(20, 130, 110),
+    rot: new THREE.Euler(0, 5.1, 0),
+    duration: 100,
+    transition: 2000,
+    fade: false,
+    fadeStart: 0 // no fade
+  },
+  {
+    pos: new THREE.Vector3(20, 20, 110),
+    rot: new THREE.Euler(0, 5, 0),
+    duration: 1000,
+    transition: 40000,
+    fade: true,
+    fadeStart: 1500 // start fading 1.5s BEFORE the shot ends
+  },
+  {
+    pos: new THREE.Vector3(98, 60, 110),
+    rot: new THREE.Euler(0, 1, 0),
+    duration: 100,
+    transition: 2000,
+    fade: false,
+    fadeStart: 0 // no fade
+  },
+  {
+    pos: new THREE.Vector3(0, 20, 0),
+    rot: new THREE.Euler(1, 0.8, 0),
+    duration: 1000,
+    transition: 40000,
+    fade: true,
+    fadeStart: 1500 // start fading 1.5s BEFORE the shot ends
+  }
+];
+
+
+let currentShot = 0;
+let shotStartTime = performance.now();
+let transitioning = false;
+
+window.addEventListener("load", () => {
+    document.getElementById("fade").style.opacity = 0;
+});
+
+
+function updateCinematic() {
+    const now = performance.now();
+    const shot = cinematicShots[currentShot];
+    const elapsed = now - shotStartTime;
+
+    // -----------------------------------------
+    // TRANSITIONING BETWEEN SHOTS
+    // -----------------------------------------
+    if (transitioning) {
+        const nextIndex = (currentShot + 1) % cinematicShots.length;
+        const nextShot = cinematicShots[nextIndex];
+
+        const t = Math.min(elapsed / nextShot.transition, 1);
+
+        // Smooth position interpolation
+        cinematicCamera.position.lerpVectors(shot.pos, nextShot.pos, t);
+
+        // Smooth rotation interpolation
+        cinematicCamera.rotation.set(
+            THREE.MathUtils.lerp(shot.rot.x, nextShot.rot.x, t),
+            THREE.MathUtils.lerp(shot.rot.y, nextShot.rot.y, t),
+            THREE.MathUtils.lerp(shot.rot.z, nextShot.rot.z, t)
+        );
+
+        // Transition finished
+        if (t >= 1) {
+            currentShot = nextIndex;
+            shotStartTime = now;
+            transitioning = false;
+
+            // Reset fade trigger for the new shot
+            cinematicShots[currentShot]._fadeTriggered = false;
+
+            // Fade back in AFTER transition is complete
+            fade.style.opacity = 0;
+        }
+
+        return;
+    }
+
+    // -----------------------------------------
+    // HOLD CURRENT SHOT
+    // -----------------------------------------
+    cinematicCamera.position.copy(shot.pos);
+    cinematicCamera.rotation.copy(shot.rot);
+
+    // -----------------------------------------
+    // EARLY FADE START (BEFORE shot ends)
+    // -----------------------------------------
+    if (shot.fade && !shot._fadeTriggered && elapsed >= (shot.duration - shot.fadeStart)) {
+
+        shot._fadeTriggered = true;
+
+        fade.style.opacity = 1; // fade to black
+
+        // AFTER fade completes, start transition
+        setTimeout(() => {
+            transitioning = true;
+            shotStartTime = performance.now();
+            // DO NOT teleport camera — lerp will handle it
+        }, 2500); // match CSS fade duration
+
+        return;
+    }
+
+    // -----------------------------------------
+    // NORMAL TRANSITION (no fade)
+    // -----------------------------------------
+    if (!shot.fade && elapsed >= shot.duration) {
+        transitioning = true;
+        shotStartTime = now;
+        return;
+    }
+}
 
 // -----------------------------------------------------
 // LIGHTING
@@ -398,66 +578,64 @@ loadModel('/assets/HotelWalls17.glb', skyboxTexture, (model) => {
 // MAIN GAME LOOP
 // -----------------------------------------------------
 function animate() {
-  requestAnimationFrame(animate);
+    requestAnimationFrame(animate);
 
-  const delta = clock.getDelta();
-  const speed = 10;
-
-  // Save old position BEFORE movement
-  const oldPos = playerCollider.position.clone();
-
-  // Apply friction
-  velocity.x -= velocity.x * 10 * delta;
-  velocity.z -= velocity.z * 10 * delta;
-
-  // Apply gravity
-  velocity.y -= gravity * delta;
-
-  // Movement direction
-  direction.z = Number(move.forward) - Number(move.backward);
-  direction.x = Number(move.right) - Number(move.left);
-  direction.normalize();
-
-  // Camera forward/right vectors
-  const forward = new THREE.Vector3();
-  controls.getDirection(forward);
-  forward.y = 0;
-  forward.normalize();
-
-  const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0, 1, 0));
-
-  // Move player collider
-  playerCollider.position.addScaledVector(forward, direction.z * speed * delta);
-  playerCollider.position.addScaledVector(right, direction.x * speed * delta);
-
-  // COLLISION CHECK
-  if (checkCollision()) {
-      playerCollider.position.copy(oldPos); // revert movement
-      velocity.y = 0; // stop falling into walls
-  }
-
-  const ray = new THREE.Raycaster(
-    playerCollider.position,
-    new THREE.Vector3(0, -1, 0)
-);
-
-const hits = ray.intersectObjects(floors, true);
-
-if (hits.length > 0) {
-    const y = hits[0].point.y + playerHeight;
-
-    // If player is at or below the floor height
-    if (playerCollider.position.y <= y + 0.05) {
-        playerCollider.position.y = y;
-        velocity.y = 0;      // <— THIS stops infinite gravity
-        canJump = true;      // <— allows jumping again
+    if (gameState === "cinematic") {
+        updateCinematic();
+        renderer.render(scene, cinematicCamera);
+        return;
     }
-}
 
-  // Sync camera to collider
-  controls.getObject().position.copy(playerCollider.position);
+    // -------------------------
+    // FIRST PERSON MODE
+    // -------------------------
+    const delta = clock.getDelta();
+    const speed = 10;
 
-  composer.render();
+    const oldPos = playerCollider.position.clone();
+
+    velocity.x -= velocity.x * 10 * delta;
+    velocity.z -= velocity.z * 10 * delta;
+    velocity.y -= gravity * delta;
+
+    direction.z = Number(move.forward) - Number(move.backward);
+    direction.x = Number(move.right) - Number(move.left);
+    direction.normalize();
+
+    const forward = new THREE.Vector3();
+    controls.getDirection(forward);
+    forward.y = 0;
+    forward.normalize();
+
+    const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0, 1, 0));
+
+    playerCollider.position.addScaledVector(forward, direction.z * speed * delta);
+    playerCollider.position.addScaledVector(right, direction.x * speed * delta);
+
+    if (checkCollision()) {
+        playerCollider.position.copy(oldPos);
+        velocity.y = 0;
+    }
+
+    const ray = new THREE.Raycaster(
+        playerCollider.position,
+        new THREE.Vector3(0, -1, 0)
+    );
+
+    const hits = ray.intersectObjects(floors, true);
+
+    if (hits.length > 0) {
+        const y = hits[0].point.y + playerHeight;
+        if (playerCollider.position.y <= y + 0.05) {
+            playerCollider.position.y = y;
+            velocity.y = 0;
+            canJump = true;
+        }
+    }
+
+    controls.getObject().position.copy(playerCollider.position);
+
+    composer.render();
 }
 
 // -----------------------------------------------------
