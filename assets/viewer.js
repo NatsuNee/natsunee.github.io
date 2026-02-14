@@ -4,7 +4,9 @@
 import * as THREE from 'three';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { SSAOPass } from "three/addons/postprocessing/SSAOPass.js";
 
 // -----------------------------------------------------
 // BASE SETUP: Scene, Renderer, Camera
@@ -51,12 +53,68 @@ document.body.addEventListener('click', () => controls.lock());
 // -----------------------------------------------------
 // LIGHTING
 // -----------------------------------------------------
-scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+scene.add(new THREE.AmbientLight(0xffffff, 0.1));
+const hemi = new THREE.HemisphereLight(
+  0xffffff,   // sky
+  0xcccccc,   // ground (slightly gray, removes magenta bias)
+  0.5
+);
+scene.add(hemi);
 
-const keyLight = new THREE.DirectionalLight(0xffffff, 0.6);
-keyLight.position.set(5, 5, 5);
-keyLight.castShadow = true;
-scene.add(keyLight);
+THREE.MeshStandardMaterial.prototype.shadowSide = THREE.FrontSide;
+
+// SUN LIGHT (Directional Light)
+const sun = new THREE.DirectionalLight(0xffffff, 1.2);
+sun.position.set(20, 50, 180); // high + angled like real sun
+sun.castShadow = true;
+
+// Shadow quality
+sun.shadow.mapSize.width = 2048;
+sun.shadow.mapSize.height = 2048;
+
+// Shadow camera bounds (VERY important)
+sun.shadow.camera.near = 1;
+sun.shadow.camera.far = 300;
+
+sun.shadow.camera.left = -300;
+sun.shadow.camera.right = 300;
+sun.shadow.camera.top = 300;
+sun.shadow.camera.bottom = -300;
+
+
+
+// Slight softness
+sun.shadow.radius = 0;
+sun.shadow.normalBias = 0.05;
+
+
+// Add to scene
+scene.add(sun);
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+
+
+const ssaoPass = new SSAOPass(
+    scene,
+    camera,
+    window.innerWidth,
+    window.innerHeight
+);
+
+ssaoPass.originalColorSpace = THREE.SRGBColorSpace; // ⭐ FIXES PINK TINT
+
+ssaoPass.enabled = false;
+ssaoPass.kernelRadius = 0.3;
+ssaoPass.minDistance = 0.0001;
+ssaoPass.maxDistance = 0.03;
+ssaoPass.aoClamp = 10;
+ssaoPass.lumInfluence = 0;
+ssaoPass.onlyAO = false;
+ssaoPass.output = SSAOPass.OUTPUT.Default;
+
+composer.addPass(ssaoPass);
+
 
 
 // -----------------------------------------------------
@@ -68,10 +126,11 @@ const floors = [];
 
 
 const playerCollider = new THREE.Mesh(
-  new THREE.CapsuleGeometry(0.3, 1.0, 4, 8),
+  new THREE.CapsuleGeometry(0.2, 1.0, 4, 8),
   new THREE.MeshBasicMaterial({ visible: false })
 );
-playerCollider.position.set(100, 79, 100);  //SPAWN
+playerCollider.position.set(93, 79, 110);  //SPAWN
+controls.getObject().rotation.y = 90;
 scene.add(playerCollider);
 
 function checkCollision() {
@@ -180,7 +239,7 @@ function loadModel(path, envMap, onLoad) {
 }
 
 loadModel('/assets/Chill Guy.glb', skyboxTexture, (model) => {
-    model.position.sub(new THREE.Vector3(0, 1, 0));
+    model.position.sub(new THREE.Vector3(-93, -77, -99));
     scene.add(model);
 });
 
@@ -259,25 +318,7 @@ loadModel('/assets/HotelWalls5.glb', skyboxTexture, (model) => {
     scene.add(model);
 });
 
-loadModel('/assets/HotelWalls6.glb', skyboxTexture, (model) => {
-    model.position.sub(new THREE.Vector3(0, 2, 0));
-    model.traverse((child) => {
-        if (child.isMesh) {
-            colliders.push(child);
-        }
-    });
-    scene.add(model);
-});
 
-loadModel('/assets/HotelWalls7.glb', skyboxTexture, (model) => {
-    model.position.sub(new THREE.Vector3(0, 2, 0));
-    model.traverse((child) => {
-        if (child.isMesh) {
-            colliders.push(child);
-        }
-    });
-    scene.add(model);
-});
 
 loadModel('/assets/HotelWalls8.glb', skyboxTexture, (model) => {
     model.position.sub(new THREE.Vector3(0, 2, 0));
@@ -339,36 +380,6 @@ loadModel('/assets/HotelWalls13.glb', skyboxTexture, (model) => {
     scene.add(model);
 });
 
-loadModel('/assets/HotelWalls14.glb', skyboxTexture, (model) => {
-    model.position.sub(new THREE.Vector3(0, 2, 0));
-    model.traverse((child) => {
-        if (child.isMesh) {
-            colliders.push(child);
-        }
-    });
-    scene.add(model);
-});
-
-loadModel('/assets/HotelWalls15.glb', skyboxTexture, (model) => {
-    model.position.sub(new THREE.Vector3(0, 2, 0));
-    model.traverse((child) => {
-        if (child.isMesh) {
-            colliders.push(child);
-        }
-    });
-    scene.add(model);
-});
-
-loadModel('/assets/HotelWalls16.glb', skyboxTexture, (model) => {
-    model.position.sub(new THREE.Vector3(0, 2, 0));
-    model.traverse((child) => {
-        if (child.isMesh) {
-            colliders.push(child);
-        }
-    });
-    scene.add(model);
-});
-
 loadModel('/assets/HotelWalls17.glb', skyboxTexture, (model) => {
     model.position.sub(new THREE.Vector3(0, 2, 0));
     model.traverse((child) => {
@@ -378,6 +389,9 @@ loadModel('/assets/HotelWalls17.glb', skyboxTexture, (model) => {
     });
     scene.add(model);
 });
+
+
+
 
 
 // -----------------------------------------------------
@@ -443,7 +457,7 @@ if (hits.length > 0) {
   // Sync camera to collider
   controls.getObject().position.copy(playerCollider.position);
 
-  renderer.render(scene, camera);
+  composer.render();
 }
 
 // -----------------------------------------------------
