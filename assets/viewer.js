@@ -448,132 +448,25 @@ loadModel('/assets/HotelFloor.glb', skyboxTexture, (model) => {
     scene.add(model);
 });
 
-loadModel('/assets/HotelWalls.glb', skyboxTexture, (model) => {
+// loadModel('/assets/HotelWalls.glb', skyboxTexture, (model) => {
+//     model.position.sub(new THREE.Vector3(0, 2, 0));
+//     model.traverse((child) => {
+//         if (child.isMesh) {
+//             colliders.push(child);
+//         }
+//     });
+//     scene.add(model);
+// });
+
+loadModel('/assets/Everything.glb', skyboxTexture, (model) => {
     model.position.sub(new THREE.Vector3(0, 2, 0));
     model.traverse((child) => {
         if (child.isMesh) {
-            colliders.push(child);
+            floors.push(child);
         }
     });
     scene.add(model);
 });
-
-loadModel('/assets/HotelWalls2.glb', skyboxTexture, (model) => {
-    model.position.sub(new THREE.Vector3(0, 2, 0));
-    model.traverse((child) => {
-        if (child.isMesh) {
-            colliders.push(child);
-        }
-    });
-    scene.add(model);
-});
-
-loadModel('/assets/HotelWalls3.glb', skyboxTexture, (model) => {
-    model.position.sub(new THREE.Vector3(0, 2, 0));
-    model.traverse((child) => {
-        if (child.isMesh) {
-            colliders.push(child);
-        }
-    });
-    scene.add(model);
-});
-
-loadModel('/assets/HotelWalls4.glb', skyboxTexture, (model) => {
-    model.position.sub(new THREE.Vector3(0, 2, 0));
-    model.traverse((child) => {
-        if (child.isMesh) {
-            colliders.push(child);
-        }
-    });
-    scene.add(model);
-});
-
-loadModel('/assets/HotelWalls5.glb', skyboxTexture, (model) => {
-    model.position.sub(new THREE.Vector3(0, 2, 0));
-    model.traverse((child) => {
-        if (child.isMesh) {
-            colliders.push(child);
-        }
-    });
-    scene.add(model);
-});
-
-
-
-loadModel('/assets/HotelWalls8.glb', skyboxTexture, (model) => {
-    model.position.sub(new THREE.Vector3(0, 2, 0));
-    model.traverse((child) => {
-        if (child.isMesh) {
-            colliders.push(child);
-        }
-    });
-    scene.add(model);
-});
-
-loadModel('/assets/HotelWalls9.glb', skyboxTexture, (model) => {
-    model.position.sub(new THREE.Vector3(0, 2, 0));
-    model.traverse((child) => {
-        if (child.isMesh) {
-            colliders.push(child);
-        }
-    });
-    scene.add(model);
-});
-
-loadModel('/assets/HotelWalls10.glb', skyboxTexture, (model) => {
-    model.position.sub(new THREE.Vector3(0, 2, 0));
-    model.traverse((child) => {
-        if (child.isMesh) {
-            colliders.push(child);
-        }
-    });
-    scene.add(model);
-});
-
-loadModel('/assets/HotelWalls11.glb', skyboxTexture, (model) => {
-    model.position.sub(new THREE.Vector3(0, 2, 0));
-    model.traverse((child) => {
-        if (child.isMesh) {
-            colliders.push(child);
-        }
-    });
-    scene.add(model);
-});
-
-loadModel('/assets/HotelWalls12.glb', skyboxTexture, (model) => {
-    model.position.sub(new THREE.Vector3(0, 2, 0));
-    model.traverse((child) => {
-        if (child.isMesh) {
-            colliders.push(child);
-        }
-    });
-    scene.add(model);
-});
-
-loadModel('/assets/HotelWalls13.glb', skyboxTexture, (model) => {
-    model.position.sub(new THREE.Vector3(0, 2, 0));
-    model.traverse((child) => {
-        if (child.isMesh) {
-            colliders.push(child);
-        }
-    });
-    scene.add(model);
-});
-
-loadModel('/assets/HotelWalls17.glb', skyboxTexture, (model) => {
-    model.position.sub(new THREE.Vector3(0, 2, 0));
-    model.traverse((child) => {
-        if (child.isMesh) {
-            colliders.push(child);
-        }
-    });
-    scene.add(model);
-});
-
-
-
-
-
 // -----------------------------------------------------
 // MAIN GAME LOOP
 // -----------------------------------------------------
