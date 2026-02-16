@@ -49,6 +49,6 @@
   opacity: 1;           /* Start fully black */
   pointer-events: none; /* Don't block clicks */
   transition: opacity 2.5s ease; /* Smooth fade */
-  z-index: 9999;
+  z-index: 1;
 }
 
