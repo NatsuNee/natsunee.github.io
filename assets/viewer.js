@@ -1128,25 +1128,24 @@ function animate() {
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
 if (isMobile) {
-    // -------------------------
-    // MOBILE TANK CONTROLS
-    // -------------------------
-
-    // ROTATION (A/D on joystick)
+    const tankSpeed = 4;
     const oldPos = playerCollider.position.clone();
 
-    // rotation
-    if (move.left) controls.getObject().rotation.y += 1.5 * delta;
-    if (move.right) controls.getObject().rotation.y -= 1.5 * delta;
+    // ROTATION (left/right)
+    if (move.left) {
+        camera.rotation.y += 1.5 * delta;
+    }
+    if (move.right) {
+        camera.rotation.y -= 1.5 * delta;
+    }
 
-    // forward vector
-    const forward = new THREE.Vector3(
-        Math.sin(controls.getObject().rotation.y),
-        0,
-        -Math.cos(controls.getObject().rotation.y)
-    );
+    // FORWARD VECTOR BASED ON CAMERA ORIENTATION
+    const forward = new THREE.Vector3();
+    camera.getWorldDirection(forward);
+    forward.y = 0;          // keep movement flat
+    forward.normalize();
 
-    // movement
+    // MOVEMENT (forward/back)
     if (move.forward) {
         playerCollider.position.addScaledVector(forward, tankSpeed * delta);
     }
@@ -1154,11 +1153,10 @@ if (isMobile) {
         playerCollider.position.addScaledVector(forward, -tankSpeed * delta);
     }
 
-    // collision rollback
+    // COLLISION ROLLBACK
     if (checkCollision()) {
         playerCollider.position.copy(oldPos);
     }
-
 
 } else {
     // -------------------------
