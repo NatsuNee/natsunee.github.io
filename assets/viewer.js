@@ -47,18 +47,18 @@ container.appendChild(renderer.domElement);
 // -----------------------------------------------------
 // SKYBOX
 // -----------------------------------------------------
-// const cubeLoader = new THREE.CubeTextureLoader();
-// cubeLoader.setPath('/assets/skybox/');
-// const skyboxTexture = cubeLoader.load([
-//   'px.png','nx.png','py.png','ny.png','pz.png','nz.png'
-// ]);
+const cubeLoader = new THREE.CubeTextureLoader();
+cubeLoader.setPath('/assets/skybox/');
+const skyboxTexture = cubeLoader.load([
+  'px.png','nx.png','py.png','ny.png','pz.png','nz.png'
+]);
 
 
 let envMap;
 
 const pmrem = new THREE.PMREMGenerator(renderer);
 
-new EXRLoader().load('assets/skybox/107_hdrmaps_com_free_10K.exr?v=2', (exrTexture) => {
+new EXRLoader().load('assets/skybox/107_hdrmaps_com_free_1K.exr?v=2', (exrTexture) => {
     exrTexture.mapping = THREE.EquirectangularReflectionMapping;
 
     envMap = pmrem.fromEquirectangular(exrTexture).texture;
@@ -566,6 +566,65 @@ function checkCollision() {
 }
 
 // -----------------------------------------------------
+// SNOW PARTICLES
+// -----------------------------------------------------
+const snowCount = 500;
+const snowGeometry = new THREE.BufferGeometry();
+
+const positions = new Float32Array(snowCount * 3);
+const velocities = new Float32Array(snowCount);
+
+const buildingMin = new THREE.Vector3(81.3093, 0, 85.0997);
+const buildingMax = new THREE.Vector3(140.5057, 100, 118.7813);
+
+
+function randomSnowPosition() {
+    let x, y, z;
+
+    while (true) {
+        x = (Math.random() - 0.5) * 300;
+        y = Math.random() * 250 + 10;
+        z = (Math.random() - 0.5) * 300 + 50;
+
+        // reject positions inside the building
+        if (
+            x < buildingMin.x || x > buildingMax.x ||
+            z < buildingMin.z || z > buildingMax.z
+        ) {
+            return { x, y, z };
+        }
+    }
+}
+
+const fogColor = new THREE.Color(0xdedede);
+scene.fog = new THREE.FogExp2(fogColor, 0.005);
+renderer.setClearColor(fogColor);
+
+// INITIALIZE SNOW ONCE
+for (let i = 0; i < snowCount; i++) {
+    const p = randomSnowPosition();
+    positions[i * 3 + 0] = p.x;
+    positions[i * 3 + 1] = p.y;
+    positions[i * 3 + 2] = p.z;
+
+    velocities[i] = 0.001 + Math.random() * 0.3;
+}
+
+snowGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+snowGeometry.setAttribute("velocity", new THREE.BufferAttribute(velocities, 1));
+
+const snowMaterial = new THREE.PointsMaterial({
+    color: 0xffffff,
+    size: 0.8,
+    transparent: true,
+    opacity: 0.9,
+    depthWrite: false
+});
+
+const snow = new THREE.Points(snowGeometry, snowMaterial);
+scene.add(snow);
+
+// -----------------------------------------------------
 // MOVEMENT STATE + PHYSICS
 // -----------------------------------------------------
 const move = { forward: false, backward: false, left: false, right: false };
@@ -1053,11 +1112,30 @@ function animate() {
         }
     }
 
-    
+    const pos = snowGeometry.attributes.position;
+    const vel = snowGeometry.attributes.velocity;
+
+    for (let i = 0; i < snowCount; i++) {
+        pos.array[i * 3 + 1] -= vel.array[i];
+
+        if (pos.array[i * 3 + 1] < 0) {
+            const p = randomSnowPosition();
+            pos.array[i * 3 + 0] = p.x;
+            pos.array[i * 3 + 1] = p.y;
+            pos.array[i * 3 + 2] = p.z;
+        }
+    }
+
+    console.log(playerCollider.position);
+
+    pos.needsUpdate = true;
+
     controls.getObject().position.copy(playerCollider.position);
 
     composer.render();
 }
+
+
 
 // -----------------------------------------------------
 // RESIZE HANDLING
