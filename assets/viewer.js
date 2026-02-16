@@ -116,6 +116,7 @@ const tankSpeed = 4;
 let joyActive = false;
 let startX = 0;
 let startY = 0;
+let yaw = 0;
 
 window.addEventListener("touchstart", (e) => {
     const t = e.touches[0];
@@ -1130,22 +1131,21 @@ function animate() {
 if (isMobile) {
     const tankSpeed = 4;
     const oldPos = playerCollider.position.clone();
-    
-    // ROTATION (left/right)
-    if (move.left) {
-        camera.rotation.y -= 1.5 * delta;   // turn left
-    }
-    if (move.right) {
-        camera.rotation.y += 1.5 * delta;   // turn right
-    }
 
-    // FORWARD VECTOR BASED ON CAMERA ORIENTATION
-    const forward = new THREE.Vector3();
-    camera.getWorldDirection(forward);
-    forward.y = 0;          // keep movement flat
-    forward.normalize();
+    // ROTATION
+    if (move.left)  yaw += 1.5 * delta;   // turn left
+    if (move.right) yaw -= 1.5 * delta;   // turn right
 
-    // MOVEMENT (forward/back)
+    camera.rotation.y = yaw;
+
+    // FORWARD VECTOR BASED ON YAW
+    const forward = new THREE.Vector3(
+        Math.sin(yaw),
+        0,
+        -Math.cos(yaw)
+    );
+
+    // MOVEMENT
     if (move.forward) {
         playerCollider.position.addScaledVector(forward, tankSpeed * delta);
     }
@@ -1157,7 +1157,7 @@ if (isMobile) {
     if (checkCollision()) {
         playerCollider.position.copy(oldPos);
     }
-
+    
 } else {
     // -------------------------
     // PC NORMAL FPS CONTROLS
