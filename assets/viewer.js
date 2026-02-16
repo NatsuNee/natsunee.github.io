@@ -110,48 +110,54 @@ playButton.addEventListener("click", () => {
     controls.lock();
 });
 
-const joystickBase = document.getElementById("joystick-base");
-const joystickStick = document.getElementById("joystick-stick");
+const stick = document.getElementById("joystick-stick");
+const tankSpeed = 4;
 
 let joyActive = false;
-let joyStartX = 0;
-let joyStartY = 0;
+let startX = 0;
+let startY = 0;
 
-joystickBase.addEventListener("touchstart", (e) => {
+window.addEventListener("touchstart", (e) => {
     const t = e.touches[0];
     joyActive = true;
-    joyStartX = t.clientX;
-    joyStartY = t.clientY;
+
+    startX = t.clientX;
+    startY = t.clientY;
+
+    stick.style.left = `${startX}px`;
+    stick.style.top = `${startY}px`;
+    stick.style.display = "block";
 });
 
-joystickBase.addEventListener("touchmove", (e) => {
+window.addEventListener("touchmove", (e) => {
     if (!joyActive) return;
 
     const t = e.touches[0];
-    const dx = t.clientX - joyStartX;
-    const dy = t.clientY - joyStartY;
+    const dx = t.clientX - startX;
+    const dy = t.clientY - startY;
 
-    const maxDist = 50;
+    const maxDist = 60;
     const dist = Math.min(maxDist, Math.hypot(dx, dy));
     const angle = Math.atan2(dy, dx);
 
     const stickX = Math.cos(angle) * dist;
     const stickY = Math.sin(angle) * dist;
 
-    joystickStick.style.transform = `translate(${stickX}px, ${stickY}px)`;
+    stick.style.transform = `translate(${stickX - 40}px, ${stickY - 40}px)`;
 
-    // Tank control mapping
     move.forward  = stickY < -10;
     move.backward = stickY > 10;
     move.left     = stickX < -10;
     move.right    = stickX > 10;
 });
 
-joystickBase.addEventListener("touchend", () => {
+window.addEventListener("touchend", () => {
     joyActive = false;
-    joystickStick.style.transform = "translate(0px, 0px)";
+    stick.style.display = "none";
+
     move.forward = move.backward = move.left = move.right = false;
 });
+
 
 if (isMobile) {
     controls.enabled = false;
@@ -1127,26 +1133,32 @@ if (isMobile) {
     // -------------------------
 
     // ROTATION (A/D on joystick)
-    if (move.left) {
-        controls.getObject().rotation.y += 1.5 * delta;
-    }
-    if (move.right) {
-        controls.getObject().rotation.y -= 1.5 * delta;
-    }
+    const oldPos = playerCollider.position.clone();
 
-    // FORWARD/BACKWARD (W/S on joystick)
+    // rotation
+    if (move.left) controls.getObject().rotation.y += 1.5 * delta;
+    if (move.right) controls.getObject().rotation.y -= 1.5 * delta;
+
+    // forward vector
     const forward = new THREE.Vector3(
         Math.sin(controls.getObject().rotation.y),
         0,
-        Math.cos(controls.getObject().rotation.y)
+        -Math.cos(controls.getObject().rotation.y)
     );
 
+    // movement
     if (move.forward) {
-        playerCollider.position.addScaledVector(forward, speed * delta);
+        playerCollider.position.addScaledVector(forward, tankSpeed * delta);
     }
     if (move.backward) {
-        playerCollider.position.addScaledVector(forward, -speed * delta);
+        playerCollider.position.addScaledVector(forward, -tankSpeed * delta);
     }
+
+    // collision rollback
+    if (checkCollision()) {
+        playerCollider.position.copy(oldPos);
+    }
+
 
 } else {
     // -------------------------
