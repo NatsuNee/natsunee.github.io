@@ -110,59 +110,6 @@ playButton.addEventListener("click", () => {
     controls.lock();
 });
 
-const stick = document.getElementById("joystick-stick");
-const tankSpeed = 4;
-
-let joyActive = false;
-let startX = 0;
-let startY = 0;
-let yaw = 0;
-
-window.addEventListener("touchstart", (e) => {
-    const t = e.touches[0];
-    joyActive = true;
-
-    startX = t.clientX;
-    startY = t.clientY;
-
-    stick.style.left = `${startX}px`;
-    stick.style.top = `${startY}px`;
-    stick.style.display = "block";
-});
-
-window.addEventListener("touchmove", (e) => {
-    if (!joyActive) return;
-
-    const t = e.touches[0];
-    const dx = t.clientX - startX;
-    const dy = t.clientY - startY;
-
-    const maxDist = 60;
-    const dist = Math.min(maxDist, Math.hypot(dx, dy));
-    const angle = Math.atan2(dy, dx);
-
-    const stickX = Math.cos(angle) * dist;
-    const stickY = Math.sin(angle) * dist;
-
-    stick.style.transform = `translate(${stickX - 40}px, ${stickY - 40}px)`;
-
-    move.forward  = stickY < -10;
-    move.backward = stickY > 10;
-    move.left     = stickX < -10;
-    move.right    = stickX > 10;
-});
-
-window.addEventListener("touchend", () => {
-    joyActive = false;
-    stick.style.display = "none";
-
-    move.forward = move.backward = move.left = move.right = false;
-});
-
-
-if (isMobile) {
-    controls.enabled = false;
-}
 
 // -----------------------------------------------------
 // CINEMATIC SHOTS (Predefined Camera Paths)
@@ -1121,45 +1068,6 @@ function animate() {
     }
 
     // -------------------------
-    // FIRST PERSON MODE
-    // -------------------------
-    const delta = clock.getDelta();
-    const speed = 10;
-
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-if (isMobile) {
-    const tankSpeed = 4;
-    const oldPos = playerCollider.position.clone();
-
-    // ROTATION (left/right)
-    if (move.left)  yaw += 1.5 * delta;
-    if (move.right) yaw -= 1.5 * delta;
-
-    controls.getObject().rotation.y = yaw;
-
-    // FORWARD VECTOR BASED ON YAW
-    const forward = new THREE.Vector3(
-        Math.sin(yaw),
-        0,
-        -Math.cos(yaw)
-    );
-
-    // MOVEMENT
-    if (move.forward) {
-        playerCollider.position.addScaledVector(forward, tankSpeed * delta);
-    }
-    if (move.backward) {
-        playerCollider.position.addScaledVector(forward, -tankSpeed * delta);
-    }
-
-    // COLLISION ROLLBACK
-    if (checkCollision()) {
-        playerCollider.position.copy(oldPos);
-    }
-
-} else {
-    // -------------------------
     // PC NORMAL FPS CONTROLS
     // -------------------------
     direction.z = Number(move.forward) - Number(move.backward);
@@ -1219,9 +1127,6 @@ if (isMobile) {
     controls.getObject().position.copy(playerCollider.position);
 
     composer.render();
-}
-
-
 
 // -----------------------------------------------------
 // RESIZE HANDLING
