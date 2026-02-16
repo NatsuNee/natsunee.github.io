@@ -1130,13 +1130,13 @@ function animate() {
 if (isMobile) {
     const tankSpeed = 4;
     const oldPos = playerCollider.position.clone();
-
+    
     // ROTATION (left/right)
     if (move.left) {
-        camera.rotation.y += 1.5 * delta;
+        camera.rotation.y -= 1.5 * delta;   // turn left
     }
     if (move.right) {
-        camera.rotation.y -= 1.5 * delta;
+        camera.rotation.y += 1.5 * delta;   // turn right
     }
 
     // FORWARD VECTOR BASED ON CAMERA ORIENTATION
