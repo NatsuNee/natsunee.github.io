@@ -7,6 +7,9 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { SSAOPass } from "three/addons/postprocessing/SSAOPass.js";
+import { RGBELoader } from "https://unpkg.com/three@0.164.0/examples/jsm/loaders/RGBELoader.js";
+import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
+import { PMREMGenerator } from 'three';
 
 // -----------------------------------------------------
 // BASE SETUP: Scene, Renderer, Camera
@@ -32,7 +35,7 @@ cinematicCamera.position.set(120, 120, 120);
 cinematicCamera.lookAt(93, 79, 110); // your spawn area
 
 let gameState = "cinematic"; 
-// other state: "firstPerson"
+// other state: "firstPerson, cinematic"
 
 // Renderer
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -49,8 +52,22 @@ cubeLoader.setPath('/assets/skybox/');
 const skyboxTexture = cubeLoader.load([
   'px.png','nx.png','py.png','ny.png','pz.png','nz.png'
 ]);
-scene.background = skyboxTexture;
 
+
+let envMap;
+
+const pmrem = new THREE.PMREMGenerator(renderer);
+
+new EXRLoader().load('assets/skybox/107_hdrmaps_com_free_10K.exr', (exr) => {
+    exr.mapping = THREE.EquirectangularReflectionMapping;
+
+    envMap = pmrem.fromEquirectangular(exr).texture;
+
+    scene.environment = envMap; 
+    scene.background = envMap;  // ✔️ lighting only
+    exr.dispose();
+    pmrem.dispose();
+});
 
 // -----------------------------------------------------
 // PLAYER CONTROLS (Pointer Lock)
@@ -233,33 +250,25 @@ function updateCinematic() {
 // -----------------------------------------------------
 // LIGHTING
 // -----------------------------------------------------
-scene.add(new THREE.AmbientLight(0xffffff, 0.1));
-const hemi = new THREE.HemisphereLight(
-  0xffffff,   // sky
-  0xcccccc,   // ground (slightly gray, removes magenta bias)
-  0.5
-);
-scene.add(hemi);
-
 THREE.MeshStandardMaterial.prototype.shadowSide = THREE.FrontSide;
 
 // SUN LIGHT (Directional Light)
-const sun = new THREE.DirectionalLight(0xffffff, 1.2);
-sun.position.set(20, 50, 180); // high + angled like real sun
+const sun = new THREE.DirectionalLight(0xe0f0ff, 0.4);
+sun.position.set(100, 50, 180); // high + angled like real sun
 sun.castShadow = true;
 
 // Shadow quality
-sun.shadow.mapSize.width = 2048;
-sun.shadow.mapSize.height = 2048;
+sun.shadow.mapSize.width = 4048;
+sun.shadow.mapSize.height = 4048;
 
 // Shadow camera bounds (VERY important)
 sun.shadow.camera.near = 1;
 sun.shadow.camera.far = 300;
 
-sun.shadow.camera.left = -300;
+sun.shadow.camera.left = -100;
 sun.shadow.camera.right = 300;
 sun.shadow.camera.top = 300;
-sun.shadow.camera.bottom = -300;
+sun.shadow.camera.bottom = -100;
 
 
 
@@ -270,6 +279,13 @@ sun.shadow.normalBias = 0.05;
 
 // Add to scene
 scene.add(sun);
+
+const fill = new THREE.PointLight(0xffaa88, 0.05, 200);
+fill.position.set(0, 10, 0);
+scene.add(fill);
+
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.45; // lower = darker, more dramatic
 
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
@@ -295,6 +311,229 @@ ssaoPass.output = SSAOPass.OUTPUT.Default;
 
 composer.addPass(ssaoPass);
 
+const spot = new THREE.SpotLight(
+    0xffffff,   // color
+    1,        // intensity (bright enough to fill a room)
+    13,        // distance (how far the light reaches)
+    Math.PI / 0.2, // angle (wide cone)
+    0.3,        // penumbra (soft edges)
+    1.0         // decay (realistic falloff)
+);
+
+// Position the light on the ceiling
+spot.position.set(105, 80, 110);
+
+// Aim straight at the ground
+spot.target.position.set(105, 76, 110);
+
+spot.castShadow = true;
+spot.shadow.mapSize.width = 2048;
+spot.shadow.mapSize.height = 2048;
+
+scene.add(spot);
+scene.add(spot.target);
+
+const spot2 = new THREE.SpotLight(
+    0xffffff,   // color
+    1,        // intensity (bright enough to fill a room)
+    13,        // distance (how far the light reaches)
+    Math.PI / 0.2, // angle (wide cone)
+    0.3,        // penumbra (soft edges)
+    1.0         // decay (realistic falloff)
+);
+
+// Position the light on the ceiling
+spot2.position.set(103, 80, 93);
+
+// Aim straight at the ground
+spot2.target.position.set(103, 76, 93);
+
+spot2.castShadow = true;
+spot2.shadow.mapSize.width = 2048;
+spot2.shadow.mapSize.height = 2048;
+
+scene.add(spot2);
+scene.add(spot2.target);
+
+const spot3 = new THREE.SpotLight(
+    0xffffff,   // color
+    1,        // intensity (bright enough to fill a room)
+    13,        // distance (how far the light reaches)
+    Math.PI / 0.2, // angle (wide cone)
+    0.3,        // penumbra (soft edges)
+    1.0         // decay (realistic falloff)
+);
+
+// Position the light on the ceiling
+spot3.position.set(90, 80, 92);
+
+// Aim straight at the ground
+spot3.target.position.set(90, 76, 92);
+
+spot3.castShadow = true;
+spot3.shadow.mapSize.width = 2048;
+spot3.shadow.mapSize.height = 2048;
+
+scene.add(spot3);
+scene.add(spot3.target);
+
+
+const spot4 = new THREE.SpotLight(
+    0xffffff,   // color
+    1,        // intensity (bright enough to fill a room)
+    13,        // distance (how far the light reaches)
+    Math.PI / 0.2, // angle (wide cone)
+    0.3,        // penumbra (soft edges)
+    1.0         // decay (realistic falloff)
+);
+
+// Position the light on the ceiling
+spot4.position.set(117, 80, 110);
+
+// Aim straight at the ground
+spot4.target.position.set(118, 76, 110);
+
+spot4.castShadow = true;
+spot4.shadow.mapSize.width = 2048;
+spot4.shadow.mapSize.height = 2048;
+
+scene.add(spot4);
+scene.add(spot4.target);
+
+const spot5 = new THREE.SpotLight(
+    0xffffff,   // color
+    1,        // intensity (bright enough to fill a room)
+    13,        // distance (how far the light reaches)
+    Math.PI / 0.2, // angle (wide cone)
+    0.3,        // penumbra (soft edges)
+    1.0         // decay (realistic falloff)
+);
+
+// Position the light on the ceiling
+spot5.position.set(117, 80, 110);
+
+// Aim straight at the ground
+spot5.target.position.set(117, 76, 100);
+
+spot5.castShadow = true;
+spot5.shadow.mapSize.width = 2048;
+spot5.shadow.mapSize.height = 2048;
+
+scene.add(spot5);
+scene.add(spot5.target);
+
+const spot6 = new THREE.SpotLight(
+    0xffffff,   // color
+    1,        // intensity (bright enough to fill a room)
+    13,        // distance (how far the light reaches)
+    Math.PI / 0.2, // angle (wide cone)
+    0.3,        // penumbra (soft edges)
+    1.0         // decay (realistic falloff)
+);
+
+// Position the light on the ceiling
+spot6.position.set(118, 80, 91);
+
+// Aim straight at the ground
+spot6.target.position.set(118, 76, 91);
+
+spot6.castShadow = true;
+spot6.shadow.mapSize.width = 2048;
+spot6.shadow.mapSize.height = 2048;
+
+scene.add(spot6);
+scene.add(spot6.target);
+
+
+
+const spot7 = new THREE.SpotLight(
+    0xffffff,   // color
+    1,        // intensity (bright enough to fill a room)
+    13,        // distance (how far the light reaches)
+    Math.PI / 0.2, // angle (wide cone)
+    0.3,        // penumbra (soft edges)
+    1.0         // decay (realistic falloff)
+);
+
+// Position the light on the ceiling
+spot7.position.set(118, 80, 91);
+
+// Aim straight at the ground
+spot7.target.position.set(118, 76, 91);
+
+spot7.castShadow = true;
+spot7.shadow.mapSize.width = 2048;
+spot7.shadow.mapSize.height = 2048;
+
+scene.add(spot7);
+scene.add(spot7.target);
+
+const spot8 = new THREE.SpotLight(
+    0xffffff,   // color
+    1,        // intensity (bright enough to fill a room)
+    13,        // distance (how far the light reaches)
+    Math.PI / 0.2, // angle (wide cone)
+    0.3,        // penumbra (soft edges)
+    1.0         // decay (realistic falloff)
+);
+
+// Position the light on the ceiling
+spot8.position.set(132, 80, 109);
+
+// Aim straight at the ground
+spot8.target.position.set(132, 76, 109);
+
+spot8.castShadow = true;
+spot8.shadow.mapSize.width = 2048;
+spot8.shadow.mapSize.height = 2048;
+
+scene.add(spot8);
+scene.add(spot8.target);
+
+const spot9 = new THREE.SpotLight(
+    0xffffff,   // color
+    1,        // intensity (bright enough to fill a room)
+    13,        // distance (how far the light reaches)
+    Math.PI / 0.2, // angle (wide cone)
+    0.3,        // penumbra (soft edges)
+    1.0         // decay (realistic falloff)
+);
+
+// Position the light on the ceiling
+spot9.position.set(137, 80, 116);
+
+// Aim straight at the ground
+spot9.target.position.set(137, 76, 116);
+
+spot9.castShadow = true;
+spot9.shadow.mapSize.width = 2048;
+spot9.shadow.mapSize.height = 2048;
+
+scene.add(spot9);
+scene.add(spot9.target);
+
+const spot10 = new THREE.SpotLight(
+    0xffffff,   // color
+    1,        // intensity (bright enough to fill a room)
+    13,        // distance (how far the light reaches)
+    Math.PI / 0.2, // angle (wide cone)
+    0.3,        // penumbra (soft edges)
+    1.0         // decay (realistic falloff)
+);
+
+// Position the light on the ceiling
+spot10.position.set(135, 80, 98);
+
+// Aim straight at the ground
+spot10.target.position.set(135, 76, 98);
+
+spot10.castShadow = true;
+spot10.shadow.mapSize.width = 2048;
+spot10.shadow.mapSize.height = 2048;
+
+scene.add(spot10);
+scene.add(spot10.target);
+
 
 
 // -----------------------------------------------------
@@ -309,7 +548,7 @@ const playerCollider = new THREE.Mesh(
   new THREE.CapsuleGeometry(0.2, 1.0, 4, 8),
   new THREE.MeshBasicMaterial({ visible: false })
 );
-playerCollider.position.set(93, 79, 110);  //SPAWN
+playerCollider.position.set(93, 79, 110); //SPAWN
 controls.getObject().rotation.y = 90;
 scene.add(playerCollider);
 
@@ -402,10 +641,10 @@ function prepareModel(model, envMap) {
         child.castShadow = true;
         child.receiveShadow = true;
 
-        if (child.material) {
-            child.material.envMap = envMap;
-            child.material.envMapIntensity = 1.0;
-        }
+        // if (child.material) {
+        //     child.material.envMap = envMap;
+        //     child.material.envMapIntensity = 1.0;
+        // }
     }
   });
 }
@@ -418,12 +657,22 @@ function loadModel(path, envMap, onLoad) {
   });
 }
 
-loadModel('/assets/Chill Guy.glb', skyboxTexture, (model) => {
-    model.position.sub(new THREE.Vector3(-93, -77, -99));
+loadModel('/assets/ChillGuy.glb', envMap, (model) => {
+    model.position.sub(new THREE.Vector3(-85.5, -77, -94));
+    model.rotation.y = -64;
+    
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+            child.material.envMap = envMap;
+            child.material.envMapIntensity = 1.0;
+        }
+    });
+
     scene.add(model);
 });
 
-loadModel('/assets/Ground.glb', skyboxTexture, (model) => {
+loadModel('/assets/Ground.glb', envMap, (model) => {
     model.position.sub(new THREE.Vector3(0, 2, 0));
     
     model.traverse((child) => {
@@ -435,38 +684,199 @@ loadModel('/assets/Ground.glb', skyboxTexture, (model) => {
     scene.add(model);
 });
 
-loadModel('/assets/HotelFloor.glb', skyboxTexture, (model) => {
+loadModel('/assets/Buildings.glb', envMap, (model) => {
     model.position.sub(new THREE.Vector3(0, 2, 0));
-
-    model.traverse((child) => {
-    if (child.isMesh) {
-        floors.push(child);
-        child.visible = false;
-    }
-    });
     
+    model.traverse((child) => {
+        if (child.isMesh) {
+        }
+    });
+
     scene.add(model);
 });
 
-// loadModel('/assets/HotelWalls.glb', skyboxTexture, (model) => {
+loadModel('/assets/HotelBase.glb', envMap, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    
+    model.traverse((child) => {
+        if (child.isMesh) {
+            floors.push(child); 
+        }
+    });
+
+    scene.add(model);
+});
+
+loadModel('/assets/HotelFloor.glb', envMap, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    
+    model.traverse((child) => {
+        if (child.isMesh) {
+            floors.push(child); 
+        }
+    });
+
+    scene.add(model);
+});
+
+loadModel('/assets/Decor.glb', envMap, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    
+    model.traverse((child) => {
+        if (child.isMesh) {
+        }
+    });
+
+    scene.add(model);
+});
+
+loadModel('/assets/WallDecor.glb', envMap, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    
+    model.traverse((child) => {
+        if (child.isMesh) {
+        }
+    });
+
+    scene.add(model);
+});
+
+loadModel('/assets/Hotel.001.glb', envMap, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+loadModel('/assets/HotelWalls.glb', envMap, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+loadModel('/assets/HotelWalls.001.glb', envMap, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+loadModel('/assets/HotelWalls.003.glb', envMap, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+loadModel('/assets/HotelWalls.004.glb', envMap, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+// Replace all repeated loadModel('/assets/HotelWalls.007.glb', ...) calls with incrementing numbers
+for (let i = 7; i <= 126; i++) {
+    const num = i.toString().padStart(3, '0');
+    loadModel(`/assets/HotelWalls.${num}.glb`, envMap, (model) => {
+        model.position.sub(new THREE.Vector3(0, 2, 0));
+        model.traverse((child) => {
+            if (child.isMesh) {
+                colliders.push(child);
+            }
+        });
+        scene.add(model);
+    });
+}
+
+loadModel('/assets/HotelWalls.128.glb', envMap, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+loadModel('/assets/HotelWalls.145.glb', envMap, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+loadModel('/assets/HotelWalls.146.glb', envMap, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+loadModel('/assets/HotelWalls.147.glb', envMap, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+for (let i = 4; i <= 91; i++) {
+    const num = i.toString().padStart(3, '0');
+    const path = `/assets/Cube.${num}.glb`;
+
+    loadModel(path, envMap, (model) => {
+        if (!model) {
+            console.warn(`Skipping missing: Cube.${num}.glb`);
+            return;
+        }
+
+        model.position.sub(new THREE.Vector3(0, 2, 0));
+
+        model.traverse((child) => {
+            if (child.isMesh) {
+                child.visible = false;   // ← makes the collider invisible
+                colliders.push(child);
+            }
+        });
+
+        scene.add(model);
+    });
+}
+// loadModel('/assets/Everything.glb', skyboxTexture, (model) => {
 //     model.position.sub(new THREE.Vector3(0, 2, 0));
 //     model.traverse((child) => {
 //         if (child.isMesh) {
-//             colliders.push(child);
+//             floors.push(child);
 //         }
 //     });
 //     scene.add(model);
 // });
 
-loadModel('/assets/Everything.glb', skyboxTexture, (model) => {
-    model.position.sub(new THREE.Vector3(0, 2, 0));
-    model.traverse((child) => {
-        if (child.isMesh) {
-            floors.push(child);
-        }
-    });
-    scene.add(model);
-});
 // -----------------------------------------------------
 // MAIN GAME LOOP
 // -----------------------------------------------------
@@ -526,6 +936,7 @@ function animate() {
         }
     }
 
+    
     controls.getObject().position.copy(playerCollider.position);
 
     composer.render();
