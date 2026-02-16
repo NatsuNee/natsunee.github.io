@@ -14,6 +14,8 @@ import { PMREMGenerator } from 'three';
 // -----------------------------------------------------
 // BASE SETUP: Scene, Renderer, Camera
 // -----------------------------------------------------
+
+const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 const container = document.getElementById('viewer');
 const scene = new THREE.Scene();
 
@@ -1071,12 +1073,39 @@ function animate() {
     const delta = clock.getDelta();
     const speed = 10;
 
-    const oldPos = playerCollider.position.clone();
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-    velocity.x -= velocity.x * 10 * delta;
-    velocity.z -= velocity.z * 10 * delta;
-    velocity.y -= gravity * delta;
+if (isMobile) {
+    // -------------------------
+    // MOBILE TANK CONTROLS
+    // -------------------------
 
+    // ROTATION (A/D on joystick)
+    if (move.left) {
+        controls.getObject().rotation.y += 1.5 * delta;
+    }
+    if (move.right) {
+        controls.getObject().rotation.y -= 1.5 * delta;
+    }
+
+    // FORWARD/BACKWARD (W/S on joystick)
+    const forward = new THREE.Vector3(
+        Math.sin(controls.getObject().rotation.y),
+        0,
+        Math.cos(controls.getObject().rotation.y)
+    );
+
+    if (move.forward) {
+        playerCollider.position.addScaledVector(forward, speed * delta);
+    }
+    if (move.backward) {
+        playerCollider.position.addScaledVector(forward, -speed * delta);
+    }
+
+} else {
+    // -------------------------
+    // PC NORMAL FPS CONTROLS
+    // -------------------------
     direction.z = Number(move.forward) - Number(move.backward);
     direction.x = Number(move.right) - Number(move.left);
     direction.normalize();
@@ -1090,6 +1119,7 @@ function animate() {
 
     playerCollider.position.addScaledVector(forward, direction.z * speed * delta);
     playerCollider.position.addScaledVector(right, direction.x * speed * delta);
+}
 
     if (checkCollision()) {
         playerCollider.position.copy(oldPos);
