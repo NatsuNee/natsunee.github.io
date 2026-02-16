@@ -110,6 +110,9 @@ playButton.addEventListener("click", () => {
     controls.lock();
 });
 
+if (isMobile) {
+    controls.enabled = false;
+}
 
 // -----------------------------------------------------
 // CINEMATIC SHOTS (Predefined Camera Paths)
