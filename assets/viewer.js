@@ -58,7 +58,7 @@ let envMap;
 
 const pmrem = new THREE.PMREMGenerator(renderer);
 
-new EXRLoader().load('assets/skybox/107_hdrmaps_com_free_10K.exr', (exrTexture) => {
+new EXRLoader().load('assets/skybox/107_hdrmaps_com_free_10K.exr?v=2', (exrTexture) => {
     exrTexture.mapping = THREE.EquirectangularReflectionMapping;
 
     envMap = pmrem.fromEquirectangular(exrTexture).texture;
