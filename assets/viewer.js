@@ -63,8 +63,8 @@ new EXRLoader().load('assets/skybox/107_hdrmaps_com_free_10K.exr', (exr) => {
 
     envMap = pmrem.fromEquirectangular(exr).texture;
 
-    scene.environment = envMap; 
-    scene.background = envMap;  // ✔️ lighting only
+    scene.environment = skyboxTexture; 
+    scene.background = skyboxTexture;  // ✔️ lighting only
     exr.dispose();
     pmrem.dispose();
 });
@@ -845,7 +845,18 @@ loadModel('/assets/HotelWalls.147.glb', envMap, (model) => {
     scene.add(model);
 });
 
-for (let i = 4; i <= 91; i++) {
+loadModel('/assets/Cube.004.glb', envMap, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            child.visible = false; 
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+for (let i = 12; i <= 15; i++) {
     const num = i.toString().padStart(3, '0');
     const path = `/assets/Cube.${num}.glb`;
 
@@ -867,6 +878,111 @@ for (let i = 4; i <= 91; i++) {
         scene.add(model);
     });
 }
+
+loadModel('/assets/Cube.017.glb', envMap, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+        if (child.isMesh) {
+            child.visible = false; 
+            colliders.push(child);
+        }
+    });
+    scene.add(model);
+});
+
+for (let i = 19; i <= 22; i++) {
+    const num = i.toString().padStart(3, '0');
+    const path = `/assets/Cube.${num}.glb`;
+
+    loadModel(path, envMap, (model) => {
+        if (!model) {
+            console.warn(`Skipping missing: Cube.${num}.glb`);
+            return;
+        }
+
+        model.position.sub(new THREE.Vector3(0, 2, 0));
+
+        model.traverse((child) => {
+            if (child.isMesh) {
+                child.visible = false;   // ← makes the collider invisible
+                colliders.push(child);
+            }
+        });
+
+        scene.add(model);
+    });
+}
+
+for (let i = 24; i <= 26; i++) {
+    const num = i.toString().padStart(3, '0');
+    const path = `/assets/Cube.${num}.glb`;
+
+    loadModel(path, envMap, (model) => {
+        if (!model) {
+            console.warn(`Skipping missing: Cube.${num}.glb`);
+            return;
+        }
+
+        model.position.sub(new THREE.Vector3(0, 2, 0));
+
+        model.traverse((child) => {
+            if (child.isMesh) {
+                child.visible = false;   // ← makes the collider invisible
+                colliders.push(child);
+            }
+        });
+
+        scene.add(model);
+    });
+}
+
+for (let i = 29; i <= 33; i++) {
+    const num = i.toString().padStart(3, '0');
+    const path = `/assets/Cube.${num}.glb`;
+
+    loadModel(path, envMap, (model) => {
+        if (!model) {
+            console.warn(`Skipping missing: Cube.${num}.glb`);
+            return;
+        }
+
+        model.position.sub(new THREE.Vector3(0, 2, 0));
+
+        model.traverse((child) => {
+            if (child.isMesh) {
+                child.visible = false;   // ← makes the collider invisible
+                colliders.push(child);
+            }
+        });
+
+        scene.add(model);
+    });
+}
+
+for (let i = 35; i <= 91; i++) {
+    const num = i.toString().padStart(3, '0');
+    const path = `/assets/Cube.${num}.glb`;
+
+    loadModel(path, envMap, (model) => {
+        if (!model) {
+            console.warn(`Skipping missing: Cube.${num}.glb`);
+            return;
+        }
+
+        model.position.sub(new THREE.Vector3(0, 2, 0));
+
+        model.traverse((child) => {
+            if (child.isMesh) {
+                child.visible = false;   // ← makes the collider invisible
+                colliders.push(child);
+            }
+        });
+
+        scene.add(model);
+    });
+}
+
+
 // loadModel('/assets/Everything.glb', skyboxTexture, (model) => {
 //     model.position.sub(new THREE.Vector3(0, 2, 0));
 //     model.traverse((child) => {
