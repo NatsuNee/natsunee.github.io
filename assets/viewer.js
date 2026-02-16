@@ -1129,19 +1129,16 @@ function animate() {
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
 if (isMobile) {
+    const tankSpeed = 4;
     const oldPos = playerCollider.position.clone();
 
     // ROTATION (left/right)
-    if (move.left) {
-        controls.getObject().rotation.y += 1.5 * delta;   // turn left
-    }
-    if (move.right) {
-        controls.getObject().rotation.y -= 1.5 * delta;   // turn right
-    }
+    if (move.left)  yaw += 1.5 * delta;
+    if (move.right) yaw -= 1.5 * delta;
 
-    // FORWARD VECTOR BASED ON CONTROLS OBJECT
-    const yaw = controls.getObject().rotation.y;
+    controls.getObject().rotation.y = yaw;
 
+    // FORWARD VECTOR BASED ON YAW
     const forward = new THREE.Vector3(
         Math.sin(yaw),
         0,
@@ -1160,9 +1157,6 @@ if (isMobile) {
     if (checkCollision()) {
         playerCollider.position.copy(oldPos);
     }
-
-    // SYNC CAMERA TO COLLIDER
-    controls.getObject().position.copy(playerCollider.position);
 
 } else {
     // -------------------------
