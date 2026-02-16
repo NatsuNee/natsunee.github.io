@@ -14,8 +14,6 @@ import { PMREMGenerator } from 'three';
 // -----------------------------------------------------
 // BASE SETUP: Scene, Renderer, Camera
 // -----------------------------------------------------
-
-const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 const container = document.getElementById('viewer');
 const scene = new THREE.Scene();
 
@@ -1068,8 +1066,17 @@ function animate() {
     }
 
     // -------------------------
-    // PC NORMAL FPS CONTROLS
+    // FIRST PERSON MODE
     // -------------------------
+    const delta = clock.getDelta();
+    const speed = 10;
+
+    const oldPos = playerCollider.position.clone();
+
+    velocity.x -= velocity.x * 10 * delta;
+    velocity.z -= velocity.z * 10 * delta;
+    velocity.y -= gravity * delta;
+
     direction.z = Number(move.forward) - Number(move.backward);
     direction.x = Number(move.right) - Number(move.left);
     direction.normalize();
@@ -1083,7 +1090,6 @@ function animate() {
 
     playerCollider.position.addScaledVector(forward, direction.z * speed * delta);
     playerCollider.position.addScaledVector(right, direction.x * speed * delta);
-}
 
     if (checkCollision()) {
         playerCollider.position.copy(oldPos);
@@ -1127,6 +1133,9 @@ function animate() {
     controls.getObject().position.copy(playerCollider.position);
 
     composer.render();
+}
+
+
 
 // -----------------------------------------------------
 // RESIZE HANDLING
