@@ -66,15 +66,14 @@
 
 #joystick-base {
     position: fixed;
-    left: 50%;
-    top: 50%;
+    left: 50vw;
+    top: 50vh;
     width: 140px;
     height: 140px;
-    transform: translate(-50%, -50%);
     border-radius: 50%;
     background: rgba(255,255,255,0.1);
     border: 2px solid rgba(255,255,255,0.2);
-    box-sizing: border-box;
+    transform: translate(-50%, -50%);
     touch-action: none;
     z-index: 9999;
 }
