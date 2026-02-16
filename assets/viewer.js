@@ -47,11 +47,11 @@ container.appendChild(renderer.domElement);
 // -----------------------------------------------------
 // SKYBOX
 // -----------------------------------------------------
-const cubeLoader = new THREE.CubeTextureLoader();
-cubeLoader.setPath('/assets/skybox/');
-const skyboxTexture = cubeLoader.load([
-  'px.png','nx.png','py.png','ny.png','pz.png','nz.png'
-]);
+// const cubeLoader = new THREE.CubeTextureLoader();
+// cubeLoader.setPath('/assets/skybox/');
+// const skyboxTexture = cubeLoader.load([
+//   'px.png','nx.png','py.png','ny.png','pz.png','nz.png'
+// ]);
 
 
 let envMap;
