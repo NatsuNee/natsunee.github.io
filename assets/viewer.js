@@ -1120,68 +1120,74 @@ function animate() {
         return;
     }
 
+    // -------------------------
+    // FIRST PERSON MODE
+    // -------------------------
     const delta = clock.getDelta();
     const speed = 10;
 
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-    // IMPORTANT: oldPos MUST be defined BEFORE the mobile/PC split
+if (isMobile) {
     const oldPos = playerCollider.position.clone();
 
-    if (isMobile) {
-
-        // ROTATION (left/right)
-        if (move.left) {
-            controls.getObject().rotation.y += 1.5 * delta;   // turn left
-        }
-        if (move.right) {
-            controls.getObject().rotation.y -= 1.5 * delta;   // turn right
-        }
-
-        // FORWARD VECTOR BASED ON CONTROLS OBJECT
-        const yaw = controls.getObject().rotation.y;
-
-        const forward = new THREE.Vector3(
-            Math.sin(yaw),
-            0,
-            -Math.cos(yaw)
-        );
-
-        // MOVEMENT
-        if (move.forward) {
-            playerCollider.position.addScaledVector(forward, tankSpeed * delta);
-        }
-        if (move.backward) {
-            playerCollider.position.addScaledVector(forward, -tankSpeed * delta);
-        }
-
-        // SYNC CAMERA TO COLLIDER
-        controls.getObject().position.copy(playerCollider.position);
-
-    } else {
-        // PC MOVEMENT
-        direction.z = Number(move.forward) - Number(move.backward);
-        direction.x = Number(move.right) - Number(move.left);
-        direction.normalize();
-
-        const forward = new THREE.Vector3();
-        controls.getDirection(forward);
-        forward.y = 0;
-        forward.normalize();
-
-        const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0, 1, 0));
-
-        playerCollider.position.addScaledVector(forward, direction.z * speed * delta);
-        playerCollider.position.addScaledVector(right, direction.x * speed * delta);
+    // ROTATION (left/right)
+    if (move.left) {
+        controls.getObject().rotation.y += 1.5 * delta;   // turn left
+    }
+    if (move.right) {
+        controls.getObject().rotation.y -= 1.5 * delta;   // turn right
     }
 
-    // COLLISION CHECK (works for both PC + mobile)
+    // FORWARD VECTOR BASED ON CONTROLS OBJECT
+    const yaw = controls.getObject().rotation.y;
+
+    const forward = new THREE.Vector3(
+        Math.sin(yaw),
+        0,
+        -Math.cos(yaw)
+    );
+
+    // MOVEMENT
+    if (move.forward) {
+        playerCollider.position.addScaledVector(forward, tankSpeed * delta);
+    }
+    if (move.backward) {
+        playerCollider.position.addScaledVector(forward, -tankSpeed * delta);
+    }
+
+    // COLLISION ROLLBACK
+    if (checkCollision()) {
+        playerCollider.position.copy(oldPos);
+    }
+
+    // SYNC CAMERA TO COLLIDER
+    controls.getObject().position.copy(playerCollider.position);
+
+} else {
+    // -------------------------
+    // PC NORMAL FPS CONTROLS
+    // -------------------------
+    direction.z = Number(move.forward) - Number(move.backward);
+    direction.x = Number(move.right) - Number(move.left);
+    direction.normalize();
+
+    const forward = new THREE.Vector3();
+    controls.getDirection(forward);
+    forward.y = 0;
+    forward.normalize();
+
+    const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0, 1, 0));
+
+    playerCollider.position.addScaledVector(forward, direction.z * speed * delta);
+    playerCollider.position.addScaledVector(right, direction.x * speed * delta);
+}
+
     if (checkCollision()) {
         playerCollider.position.copy(oldPos);
         velocity.y = 0;
     }
 
-    // FLOOR RAYCAST
     const ray = new THREE.Raycaster(
         playerCollider.position,
         new THREE.Vector3(0, -1, 0)
@@ -1198,7 +1204,6 @@ function animate() {
         }
     }
 
-    // SNOW UPDATE
     const pos = snowGeometry.attributes.position;
     const vel = snowGeometry.attributes.velocity;
 
@@ -1213,10 +1218,28 @@ function animate() {
         }
     }
 
+    console.log(playerCollider.position);
+
     pos.needsUpdate = true;
 
-    // FINAL CAMERA SYNC
     controls.getObject().position.copy(playerCollider.position);
 
     composer.render();
 }
+
+
+
+// -----------------------------------------------------
+// RESIZE HANDLING
+// -----------------------------------------------------
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+
+// -----------------------------------------------------
+// START LOOP
+// -----------------------------------------------------
+animate();
