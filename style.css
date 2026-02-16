@@ -19,6 +19,7 @@
     left: 0;
     width: 100%;
     height: 100%;
+    touch-action: none;
     z-index: -1; /* pushes it behind everything */
 }
 
@@ -48,4 +49,42 @@
   pointer-events: none; /* Don't block clicks */
   transition: opacity 2.5s ease; /* Smooth fade */
   z-index: 9999;
+}
+
+#joystick-base {
+    position: fixed;
+    left: 40px;
+    bottom: 40px;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    border: 2px solid rgba(255,255,255,0.2);
+    touch-action: none;
+}
+
+#joystick-base {
+    position: fixed;
+    left: 40px;
+    bottom: 40px;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    border: 2px solid rgba(255,255,255,0.2);
+    touch-action: none;
+    z-index: 9999;
+}
+
+#joystick-stick {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 60px;
+    height: 60px;
+    margin-left: -30px;
+    margin-top: -30px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    touch-action: none;
 }

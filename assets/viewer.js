@@ -110,6 +110,49 @@ playButton.addEventListener("click", () => {
     controls.lock();
 });
 
+const joystickBase = document.getElementById("joystick-base");
+const joystickStick = document.getElementById("joystick-stick");
+
+let joyActive = false;
+let joyStartX = 0;
+let joyStartY = 0;
+
+joystickBase.addEventListener("touchstart", (e) => {
+    const t = e.touches[0];
+    joyActive = true;
+    joyStartX = t.clientX;
+    joyStartY = t.clientY;
+});
+
+joystickBase.addEventListener("touchmove", (e) => {
+    if (!joyActive) return;
+
+    const t = e.touches[0];
+    const dx = t.clientX - joyStartX;
+    const dy = t.clientY - joyStartY;
+
+    const maxDist = 50;
+    const dist = Math.min(maxDist, Math.hypot(dx, dy));
+    const angle = Math.atan2(dy, dx);
+
+    const stickX = Math.cos(angle) * dist;
+    const stickY = Math.sin(angle) * dist;
+
+    joystickStick.style.transform = `translate(${stickX}px, ${stickY}px)`;
+
+    // Tank control mapping
+    move.forward  = stickY < -10;
+    move.backward = stickY > 10;
+    move.left     = stickX < -10;
+    move.right    = stickX > 10;
+});
+
+joystickBase.addEventListener("touchend", () => {
+    joyActive = false;
+    joystickStick.style.transform = "translate(0px, 0px)";
+    move.forward = move.backward = move.left = move.right = false;
+});
+
 if (isMobile) {
     controls.enabled = false;
 }
