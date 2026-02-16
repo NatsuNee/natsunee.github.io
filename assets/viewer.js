@@ -1126,8 +1126,6 @@ function animate() {
         }
     }
 
-    console.log(playerCollider.position);
-
     pos.needsUpdate = true;
 
     controls.getObject().position.copy(playerCollider.position);
