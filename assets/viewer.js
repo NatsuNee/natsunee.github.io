@@ -58,14 +58,15 @@ let envMap;
 
 const pmrem = new THREE.PMREMGenerator(renderer);
 
-new EXRLoader().load('assets/skybox/107_hdrmaps_com_free_10K.exr', (exr) => {
-    exr.mapping = THREE.EquirectangularReflectionMapping;
+new EXRLoader().load('assets/skybox/107_hdrmaps_com_free_10K.exr', (exrTexture) => {
+    exrTexture.mapping = THREE.EquirectangularReflectionMapping;
 
-    envMap = pmrem.fromEquirectangular(exr).texture;
+    envMap = pmrem.fromEquirectangular(exrTexture).texture;
 
-    scene.environment = skyboxTexture; 
-    scene.background = skyboxTexture;  // ✔️ lighting only
-    exr.dispose();
+    scene.environment = envMap;
+    scene.background = envMap;
+
+    exrTexture.dispose();
     pmrem.dispose();
 });
 
