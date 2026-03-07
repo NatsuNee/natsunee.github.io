@@ -950,6 +950,13 @@ loadModel('/assets/Cube.017.glb', envMap, (model) => {
     scene.add(model);
 });
 
+loadModel('/assets/OutdoorDecor.glb', envMap, (model) => {
+    model.position.sub(new THREE.Vector3(0, 2, 0));
+    model.traverse((child) => {
+    });
+    scene.add(model);
+});
+
 for (let i = 19; i <= 22; i++) {
     const num = i.toString().padStart(3, '0');
     const path = `/assets/Cube.${num}.glb`;
