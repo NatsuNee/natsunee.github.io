@@ -122,26 +122,42 @@ const cinematicShots = [
     fadeStart: 0 // no fade
   },
   {
-    pos: new THREE.Vector3(-10, 60, 200),
-    rot: new THREE.Euler(0, 5, 0),
+    pos: new THREE.Vector3(-10, 30, 200),
+    rot: new THREE.Euler(-0.3, 5, 0),
     duration: 1000,
     transition: 40000,
     fade: true,
     fadeStart: 1500 // start fading 1.5s BEFORE the shot ends
   },
   {
-    pos: new THREE.Vector3(20, 130, 110),
-    rot: new THREE.Euler(0, 5.1, 0),
+    pos: new THREE.Vector3(80, 100, 100),
+    rot: new THREE.Euler(0, 6, 0),
     duration: 100,
     transition: 2000,
     fade: false,
     fadeStart: 0 // no fade
   },
   {
-    pos: new THREE.Vector3(20, 20, 110),
+    pos: new THREE.Vector3(80, 69, 100),
+    rot: new THREE.Euler(0, 6, 0),
+    duration: 100,
+    transition: 15000,
+    fade: true,
+    fadeStart: 1500 // start fading 1.5s BEFORE the shot ends
+  },
+  {
+    pos: new THREE.Vector3(90, 80, 84),
+    rot: new THREE.Euler(0, 4, 0),
+    duration: 100,
+    transition: 2000,
+    fade: false,
+    fadeStart: 0 // no fade
+  },
+  {
+    pos: new THREE.Vector3(90, 80, 110),
     rot: new THREE.Euler(0, 5, 0),
-    duration: 1000,
-    transition: 40000,
+    duration: 100,
+    transition: 15000,
     fade: true,
     fadeStart: 1500 // start fading 1.5s BEFORE the shot ends
   },
