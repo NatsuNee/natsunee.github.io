@@ -130,7 +130,7 @@ const cinematicShots = [
     fadeStart: 1500 // start fading 1.5s BEFORE the shot ends
   },
   {
-    pos: new THREE.Vector3(80, 100, 100),
+    pos: new THREE.Vector3(83, 100, 100),
     rot: new THREE.Euler(0, 6, 0),
     duration: 100,
     transition: 2000,
@@ -138,7 +138,7 @@ const cinematicShots = [
     fadeStart: 0 // no fade
   },
   {
-    pos: new THREE.Vector3(80, 69, 100),
+    pos: new THREE.Vector3(83, 69, 100),
     rot: new THREE.Euler(0, 6, 0),
     duration: 100,
     transition: 15000,
