@@ -330,8 +330,8 @@ composer.addPass(ssaoPass);
 
 const spot = new THREE.SpotLight(
     0xffffff,   // color
-    1,        // intensity (bright enough to fill a room)
-    13,        // distance (how far the light reaches)
+    2,        // intensity (bright enough to fill a room)
+    20,        // distance (how far the light reaches)
     Math.PI / 0.2, // angle (wide cone)
     0.3,        // penumbra (soft edges)
     1.0         // decay (realistic falloff)
@@ -352,7 +352,7 @@ scene.add(spot.target);
 
 const spot2 = new THREE.SpotLight(
     0xffffff,   // color
-    1,        // intensity (bright enough to fill a room)
+    2,        // intensity (bright enough to fill a room)
     13,        // distance (how far the light reaches)
     Math.PI / 0.2, // angle (wide cone)
     0.3,        // penumbra (soft edges)
@@ -374,7 +374,7 @@ scene.add(spot2.target);
 
 const spot3 = new THREE.SpotLight(
     0xffffff,   // color
-    1,        // intensity (bright enough to fill a room)
+    2,        // intensity (bright enough to fill a room)
     13,        // distance (how far the light reaches)
     Math.PI / 0.2, // angle (wide cone)
     0.3,        // penumbra (soft edges)
@@ -382,10 +382,10 @@ const spot3 = new THREE.SpotLight(
 );
 
 // Position the light on the ceiling
-spot3.position.set(90, 80, 92);
+spot3.position.set(80, 80, 99);
 
 // Aim straight at the ground
-spot3.target.position.set(90, 76, 92);
+spot3.target.position.set(80, 76, 99);
 
 spot3.castShadow = true;
 spot3.shadow.mapSize.width = 2048;
@@ -580,6 +580,12 @@ function checkCollision() {
     }
     return false;
 }
+
+window.getPos = () => {
+    const p = playerCollider.position;
+    console.log(`X=${p.x.toFixed(2)}, Y=${p.y.toFixed(2)}, Z=${p.z.toFixed(2)}`);
+};
+
 
 // -----------------------------------------------------
 // SNOW PARTICLES
